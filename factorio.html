@@ -1,0 +1,111 @@
+<html>
+<head>
+<script src="vivagraph.js"></script>
+<script>
+    function addLinks(graph, from, to) {
+        from.forEach(function(item) {
+            graph.addLink(item, to);
+        });
+    }
+
+    function createGraph() {
+        var graph = Viva.Graph.graph();
+        graph.addNode('Inserter', {iconName: 'Inserter-icon'})
+        graph.addNode('Low density structure', {iconName: 'Rocket-structure'})
+
+        addLinks(graph, ['Coal', 'Water'], 'Boiler')
+
+        addLinks(graph, ['Iron ore', 'Coal'], 'Iron plate')
+        addLinks(graph, ['Copper ore', 'Coal'], 'Copper plate')
+
+        graph.addLink('Iron plate', 'Steel plate');
+
+        graph.addLink('Iron plate', 'Iron gear wheel');
+        graph.addLink('Iron plate', 'Pipe')
+
+        addLinks(graph, ['Iron plate', 'Iron gear wheel'], 'Basic transport belt')
+
+        graph.addLink('Copper cable', 'Copper plate')
+
+        graph.addLink('Crude oil', 'Petroleum gas')
+        graph.addLink('Crude oil', 'Heavy oil')
+        graph.addLink('Crude oil', 'Light oil')
+
+        graph.addLink('Heavy oil', 'Lubricant')
+
+        addLinks(graph, ['Coal', 'Petroleum gas'], 'Plastic bar')
+
+        addLinks(graph, ['Petroleum gas', 'Water'], 'Sulfur')
+        addLinks(graph, ['Sulfur', 'Iron plate', 'Water'], 'Sulfuric acid')
+        addLinks(graph, ['Iron plate', 'Copper plate', 'Sulfuric acid'], 'Battery')
+
+        addLinks(graph, ['Iron plate', 'Copper cable'], 'Electronic circuit')
+        addLinks(graph, ['Electronic circuit', 'Plastic bar', 'Copper cable'], 'Advanced circuit')
+        addLinks(graph, ['Electronic circuit', 'Advanced circuit', 'Sulfuric acid'], 'Processing unit')
+
+        addLinks(graph, ['Iron gear wheel', 'Electronic circuit'], 'Inserter')
+        addLinks(graph, ['Inserter', 'Iron plate', 'Electronic circuit'], 'Fast inserter')
+        addLinks(graph, ['Fast inserter', 'Electronic circuit'], 'Filter inserter')
+
+        addLinks(graph, ['Steel plate', 'Iron gear wheel', 'Pipe'], 'Engine unit')
+        addLinks(graph, ['Engine unit', 'Electronic circuit', 'Lubricant'], 'Electric engine unit')
+
+        addLinks(graph, ['Copper plate', 'Iron gear wheel'], 'Science pack 1')
+        addLinks(graph, ['Inserter', 'Basic transport belt'], 'Science pack 2')
+        addLinks(graph, ['Battery', 'Advanced circuit', 'Filter inserter', 'Steel plate'], 'Science pack 3')
+        addLinks(graph, ['Alien artifact'], 'Alien science pack')
+
+        addLinks(graph, ['Science pack 1', 'Science pack 2', 'Science pack 3', 'Alien science pack'], 'Lab')
+
+        addLinks(graph, ['Iron plate', 'Battery'], 'Basic accumulator')
+        addLinks(graph, ['Steel plate', 'Copper plate', 'Electronic circuit'], 'Solar panel')
+
+        addLinks(graph, ['Steel plate', 'Copper plate', 'Plastic bar'], 'Low density structure')
+
+        var graphics = Viva.Graph.View.svgGraphics();
+        graphics
+            .node(function(node) {
+                if(node.data && node.data.iconName) {
+                    iconName = node.data.iconName
+                } else {
+                    iconName = node.id.replace(/ /g, '-');
+                }
+                return Viva.Graph.svg('image')
+                    .attr('width', 24)
+                    .attr('height', 24)
+                    .link('https://wiki.factorio.com/images/' + iconName + '.png');
+            })
+            .placeNode(function(nodeUI, pos){
+                // Shift image to let links go to the center:
+                nodeUI.attr('x', pos.x - 12).attr('y', pos.y - 12);
+            })
+            .placeLink(function(linkUI, fromPos, toPos){
+                linkUI.attr('x1', fromPos.x)
+                      .attr('y1', fromPos.y)
+                      .attr('x2', toPos.x)
+                      .attr('y2', toPos.y)
+            })
+            ;
+
+        var layout = Viva.Graph.Layout.forceDirected(graph, {
+            springLength : 100,
+            springCoeff : 0.00005,
+            dragCoeff : 0.01,
+            gravity : -2.2
+        });
+
+        var renderer = Viva.Graph.View.renderer(graph,
+        {
+            container: document.getElementById('graphDiv'),
+            graphics: graphics,
+            layout: layout
+        }
+        );
+        renderer.run();
+    }
+</script>
+</head>
+<body onload="createGraph()">
+    <svg height="1000" width="1000" id="graphDiv"></svg>
+</body>
+</html>
