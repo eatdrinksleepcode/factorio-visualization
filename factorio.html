@@ -2,82 +2,149 @@
 <head>
 <script src="vivagraph.js"></script>
 <script>
+
+    function makeArray(item) {
+        if(!Array.isArray(item)) {
+            item = [item]
+        }
+        return item
+    }
+
     function addLinks(graph, from, to) {
-        from.forEach(function(item) {
-            graph.addLink(item, to);
+        from = makeArray(from)
+        to = makeArray(to)
+        from.forEach(function(itemFrom) {
+            to.forEach(function(itemTo) {
+                graph.addLink(itemFrom, itemTo);
+            })
         });
     }
 
     function createGraph() {
         var graph = Viva.Graph.graph();
-        graph.addNode('Inserter', {iconName: 'Inserter-icon'})
-        graph.addNode('Low density structure', {iconName: 'Rocket-structure'})
+        graph.addNode('Inserter', {iconNames: 'Inserter-icon'})
+        graph.addNode('Low density structure', {iconNames: 'Rocket-structure'})
+        graph.addNode('Iron (Belts)', {iconNames: ['Iron-plate', 'Iron-gear-wheel']})
+        graph.addNode('Iron (Inserters)', {iconNames: ['Iron-plate', 'Iron-gear-wheel']})
+        graph.addNode('Iron plate B', {iconNames: 'Iron-plate'})
+        graph.addNode('Gear / Pipe', {iconNames: ['Iron-gear-wheel', 'Pipe']})
+        graph.addNode('Electronic circuit (Inserter)', {iconNames: 'Electronic-circuit'})
+        graph.addNode('Electronic circuit (Robot)', {iconNames: 'Electronic-circuit'})
+        graph.addNode('Electronic circuit (Module)', {iconNames: 'Electronic-circuit'})
+        graph.addNode('Electronic circuit (Engine)', {iconNames: 'Electronic-circuit'})
+        graph.addNode('Electronic circuit (Solar)', {iconNames: 'Electronic-circuit'})
+        graph.addNode('Advanced circuit (Robot)', {iconNames: 'Advanced-circuit'})
+        graph.addNode('Advanced circuit (Module)', {iconNames: 'Advanced-circuit'})
+        graph.addNode('Copper (Science)', {iconNames: 'Copper-plate'})
+        graph.addNode('Copper (Circuit)', {iconNames: 'Copper-plate'})
+        graph.addNode('Steel (Engine)', {iconNames: 'Steel-plate'})
+        graph.addNode('Steel (Science)', {iconNames: 'Steel-plate'})
+        graph.addNode('Steel (Solar)', {iconNames: 'Steel-plate'})
+        graph.addNode('Steel (Rocket)', {iconNames: 'Steel-plate'})
+        graph.addNode('Steel (Robot)', {iconNames: 'Steel-plate'})
+        graph.addNode('Steel (Cannon)', {iconNames: 'Steel-plate'})
+        graph.addNode('Coal (Chemicals)', {iconNames: 'Coal'})
 
-        addLinks(graph, ['Coal', 'Water'], 'Boiler')
+        // addLinks(graph, ['Coal', 'Water'], 'Boiler')
 
-        addLinks(graph, ['Iron ore', 'Coal'], 'Iron plate')
-        addLinks(graph, ['Copper ore', 'Coal'], 'Copper plate')
+        addLinks(graph, ['Iron ore'/*, 'Coal'*/], 'Iron plate')
+        addLinks(graph, ['Copper ore'/*, 'Coal'*/], 'Copper plate')
 
         graph.addLink('Iron plate', 'Steel plate');
 
         graph.addLink('Iron plate', 'Iron gear wheel');
-        graph.addLink('Iron plate', 'Pipe')
 
-        addLinks(graph, ['Iron plate', 'Iron gear wheel'], 'Basic transport belt')
+        addLinks(graph, 'Iron plate', 'Iron (Belts)')
+        addLinks(graph, 'Iron (Belts)', 'Basic transport belt')
+        addLinks(graph, ['Basic transport belt', 'Iron (Belts)'], 'Fast transport belt')
+        addLinks(graph, ['Fast transport belt', 'Iron (Belts)', 'Lubricant'], 'Express transport belt')
 
-        graph.addLink('Copper cable', 'Copper plate')
-
-        graph.addLink('Crude oil', 'Petroleum gas')
-        graph.addLink('Crude oil', 'Heavy oil')
-        graph.addLink('Crude oil', 'Light oil')
+        addLinks(graph, ['Crude oil'], ['Petroleum gas', 'Heavy oil', 'Light oil'])
+        addLinks(graph, ['Crude oil', 'Water'], ['Petroleum gas', 'Heavy oil', 'Light oil'])
+        
+        addLinks(graph, ['Heavy oil', 'Water'], 'Light oil')
+        addLinks(graph, ['Light oil', 'Water'], 'Petroleum gas')
 
         graph.addLink('Heavy oil', 'Lubricant')
 
-        addLinks(graph, ['Coal', 'Petroleum gas'], 'Plastic bar')
+        addLinks(graph, ['Coal (Chemicals)', 'Petroleum gas'], 'Plastic bar')
+        addLinks(graph, ['Coal (Chemicals)', 'Sulfur'], 'Explosives')
+        addLinks(graph, ['Steel (Cannon)', 'Plastic bar', 'Explosives'], 'Cannon shell')
 
+        addLinks(graph, 'Iron plate', 'Iron plate B')
         addLinks(graph, ['Petroleum gas', 'Water'], 'Sulfur')
-        addLinks(graph, ['Sulfur', 'Iron plate', 'Water'], 'Sulfuric acid')
-        addLinks(graph, ['Iron plate', 'Copper plate', 'Sulfuric acid'], 'Battery')
+        addLinks(graph, ['Sulfur', 'Iron plate B', 'Water'], 'Sulfuric acid')
+        addLinks(graph, ['Iron plate B', 'Copper plate', 'Sulfuric acid'], 'Battery')
+        addLinks(graph, ['Iron plate B', 'Battery'], 'Basic accumulator')
 
+        addLinks(graph, 'Copper plate', 'Copper (Circuit)')
+        addLinks(graph, 'Copper (Circuit)', 'Copper cable')
         addLinks(graph, ['Iron plate', 'Copper cable'], 'Electronic circuit')
         addLinks(graph, ['Electronic circuit', 'Plastic bar', 'Copper cable'], 'Advanced circuit')
         addLinks(graph, ['Electronic circuit', 'Advanced circuit', 'Sulfuric acid'], 'Processing unit')
 
-        addLinks(graph, ['Iron gear wheel', 'Electronic circuit'], 'Inserter')
-        addLinks(graph, ['Inserter', 'Iron plate', 'Electronic circuit'], 'Fast inserter')
-        addLinks(graph, ['Fast inserter', 'Electronic circuit'], 'Filter inserter')
+        addLinks(graph, 'Iron plate', 'Iron (Inserters)')
+        // addLinks(graph, 'Electronic circuit', 'Electronic circuit (Inserter)')
+        addLinks(graph, ['Iron (Inserters)', 'Electronic circuit (Inserter)'], 'Inserter')
+        addLinks(graph, ['Inserter', 'Iron (Inserters)', 'Electronic circuit (Inserter)'], 'Fast inserter')
+        addLinks(graph, ['Fast inserter', 'Electronic circuit (Inserter)'], 'Filter inserter')
 
-        addLinks(graph, ['Steel plate', 'Iron gear wheel', 'Pipe'], 'Engine unit')
-        addLinks(graph, ['Engine unit', 'Electronic circuit', 'Lubricant'], 'Electric engine unit')
-
-        addLinks(graph, ['Copper plate', 'Iron gear wheel'], 'Science pack 1')
+        addLinks(graph, 'Copper plate', 'Copper (Science)')
+        addLinks(graph, ['Copper (Science)', 'Iron gear wheel'], 'Science pack 1')
         addLinks(graph, ['Inserter', 'Basic transport belt'], 'Science pack 2')
-        addLinks(graph, ['Battery', 'Advanced circuit', 'Filter inserter', 'Steel plate'], 'Science pack 3')
+        addLinks(graph, ['Battery', 'Advanced circuit', 'Filter inserter'/*, 'Steel (Science)'*/], 'Science pack 3')
         addLinks(graph, ['Alien artifact'], 'Alien science pack')
 
         addLinks(graph, ['Science pack 1', 'Science pack 2', 'Science pack 3', 'Alien science pack'], 'Lab')
 
-        addLinks(graph, ['Iron plate', 'Battery'], 'Basic accumulator')
-        addLinks(graph, ['Steel plate', 'Copper plate', 'Electronic circuit'], 'Solar panel')
+        addLinks(graph, [/*'Steel (Solar)', */'Copper plate', 'Electronic circuit (Solar)'], 'Solar panel')
 
-        addLinks(graph, ['Steel plate', 'Copper plate', 'Plastic bar'], 'Low density structure')
+        // addLinks(graph, 'Advanced circuit', 'Advanced circuit (Module)')
+        addLinks(graph, ['Electronic circuit (Module)', 'Advanced circuit (Module)'], 'Speed module')
+        addLinks(graph, ['Advanced circuit (Module)', 'Processing unit', 'Speed module'], 'Speed module 2')
+
+        addLinks(graph, [/*'Steel (Rocket)', */'Copper plate', 'Plastic bar'], 'Low density structure')
+        addLinks(graph, 'Solid fuel', 'Rocket fuel')
+        addLinks(graph, ['Processing unit', 'Speed module'], 'Rocket control unit')
+        addLinks(graph, ['Low density structure', 'Rocket fuel', 'Rocket control unit'], 'Rocket part')
+        addLinks(graph, ['Low density structure', 'Solar panel', 'Basic accumulator', 'Radar', 'Processing unit', 'Rocket fuel'], 'Satellite')
+
+        // addLinks(graph, 'Electronic circuit', 'Electronic circuit (Robot)')
+        // addLinks(graph, 'Advanced circuit', 'Advanced circuit (Robot)')
+        addLinks(graph, 'Iron plate', 'Gear / Pipe')
+        addLinks(graph, [/*'Steel (Engine)', */'Gear / Pipe'], 'Engine unit')
+        addLinks(graph, ['Engine unit', 'Electronic circuit (Robot)', 'Lubricant'], 'Electric engine unit')
+        addLinks(graph, ['Electric engine unit'/*, 'Battery'*//*, 'Steel (Robot)'*/, 'Electronic circuit (Robot)'], 'Flying robot frame')
+        addLinks(graph, ['Flying robot frame', 'Electronic circuit (Robot)'], 'Construction robot')
+        addLinks(graph, ['Flying robot frame', 'Advanced circuit (Robot)'], 'Logistic robot')
+
+        // addLinks(graph, 'Iron ore', 'Copper ore')
 
         var graphics = Viva.Graph.View.svgGraphics();
         graphics
             .node(function(node) {
-                if(node.data && node.data.iconName) {
-                    iconName = node.data.iconName
+                if(node.data && node.data.iconNames) {
+                    iconNames = node.data.iconNames
                 } else {
-                    iconName = node.id.replace(/ /g, '-');
+                    iconNames = node.id.replace(/ /g, '-');
                 }
-                return Viva.Graph.svg('image')
-                    .attr('width', 24)
-                    .attr('height', 24)
-                    .link('https://wiki.factorio.com/images/' + iconName + '.png');
+                iconNames = makeArray(iconNames)
+                nodeGroup = Viva.Graph.svg('g')
+                makeArray(iconNames).forEach(function(iconName, index){ 
+                    nodeGroup.append('image')
+                        .attr('width', 24)
+                        .attr('height', 24)
+                        .attr('x', index * 24)
+                        .link('https://wiki.factorio.com/images/' + iconName + '.png')
+                })
+
+                nodeGroup.append('title').text(node.id);
+
+                return nodeGroup
             })
             .placeNode(function(nodeUI, pos){
                 // Shift image to let links go to the center:
-                nodeUI.attr('x', pos.x - 12).attr('y', pos.y - 12);
+                nodeUI.attr('transform', 'translate(' + (pos.x - ((nodeUI.children.length - 1) * 12)) + ',' + (pos.y - 12) + ')')
             })
             .placeLink(function(linkUI, fromPos, toPos){
                 linkUI.attr('x1', fromPos.x)
@@ -88,7 +155,7 @@
             ;
 
         var layout = Viva.Graph.Layout.forceDirected(graph, {
-            springLength : 100,
+            springLength : 150,
             springCoeff : 0.00005,
             dragCoeff : 0.01,
             gravity : -2.2
@@ -106,6 +173,6 @@
 </script>
 </head>
 <body onload="createGraph()">
-    <svg height="1000" width="1000" id="graphDiv"></svg>
+    <svg height="1200" width="1500" id="graphDiv"></svg>
 </body>
 </html>
